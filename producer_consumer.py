@@ -34,13 +34,17 @@ def consumer(queue_obj, consumer_id, stop_event):
         consumer_id: Unique identifier for the consumer
         stop_event: Event to signal when to stop
     """
-    while not stop_event.is_set() or not queue_obj.empty():
+    while True:
         try:
             item = queue_obj.get(timeout=0.5)
             print(f"Consumer {consumer_id} consumed: {item}")
             time.sleep(random.uniform(0.1, 0.3))
             queue_obj.task_done()
         except queue.Empty:
+            # If stop event is set and queue is empty, exit
+            if stop_event.is_set():
+                break
+            # Otherwise continue waiting for more items
             continue
     print(f"Consumer {consumer_id} finished")
 
