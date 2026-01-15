@@ -105,7 +105,12 @@ public class ThreadPool {
         List<Future<Integer>> futures = new ArrayList<>();
         for (Integer num : numbers) {
             futures.add(executor.submit(() -> {
-                Thread.sleep(200);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
+                }
                 return num * num;
             }));
         }
